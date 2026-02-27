@@ -2,7 +2,14 @@ import json
 import os
 from typing import List
 
-CONFIG_FILE = "ftp_config.json"
+import sys
+
+def get_config_dir():
+    if getattr(sys, 'frozen', False):
+        return os.path.dirname(sys.executable)
+    return os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+CONFIG_FILE = os.path.join(get_config_dir(), "ftp_config.json")
 
 def load_config() -> List[dict]:
     """从本地加载 FTP 服务器配置列表"""

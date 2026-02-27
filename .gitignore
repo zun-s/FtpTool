@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+env/
+.env
+
+# Tests
+.pytest_cache/
+
+# Build
+build/
+dist/
+*.spec

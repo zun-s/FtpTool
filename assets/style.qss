@@ -1,0 +1,129 @@
+/* 全局基础设置 */
+* {
+    font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+    font-size: 14px;
+    color: #333333;
+}
+
+/* 主窗口背景 */
+QMainWindow {
+    background-color: #F8F9FA;
+}
+
+/* 按钮基础样式 */
+QPushButton {
+    background-color: #FFFFFF;
+    border: 1px solid #D1D5DB;
+    border-radius: 6px;
+    padding: 6px 16px;
+    color: #4B5563;
+    font-weight: bold;
+}
+
+QPushButton:hover {
+    background-color: #F3F4F6;
+    border-color: #9CA3AF;
+}
+
+QPushButton:pressed {
+    background-color: #E5E7EB;
+}
+
+/* 主操作按钮 (Primary Button) 覆盖类，由代码单独设置 ObjectName 或特殊样式 */
+QPushButton#primaryButton {
+    background-color: #2563EB;
+    color: #FFFFFF;
+    border: none;
+    font-size: 15px;
+    padding: 10px 0px;
+    border-radius: 8px;
+}
+
+QPushButton#primaryButton:hover {
+    background-color: #1D4ED8;
+}
+
+QPushButton#primaryButton:pressed {
+    background-color: #1E40AF;
+}
+
+QPushButton#primaryButton:disabled {
+    background-color: #93C5FD;
+    color: #EFF6FF;
+}
+
+/* 列表容器 */
+QListWidget {
+    background-color: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 4px;
+    outline: none;
+}
+
+QListWidget::item {
+    border-bottom: 1px solid #F3F4F6;
+    padding: 4px;
+}
+
+QListWidget::item:selected {
+    background-color: #EFF6FF;
+    border-radius: 6px;
+    color: #1E40AF;
+}
+
+/* 分组框 GroupBox */
+QGroupBox {
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    margin-top: 1.2em;
+    background-color: #FFFFFF;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 10px;
+    padding: 0 5px 0 5px;
+    color: #1F2937;
+    font-weight: bold;
+}
+
+/* 进度条 */
+QProgressBar {
+    border: none;
+    background-color: #E5E7EB;
+    border-radius: 4px;
+    text-align: center;
+    color: #4B5563;
+    font-size: 12px;
+}
+
+QProgressBar::chunk {
+    background-color: #10B981;
+    border-radius: 4px;
+}
+
+/* 输入框 */
+QLineEdit {
+    border: 1px solid #D1D5DB;
+    border-radius: 6px;
+    padding: 6px 10px;
+    background-color: #FFFFFF;
+    selection-background-color: #BFDBFE;
+}
+
+QLineEdit:focus {
+    border: 2px solid #3B82F6;
+    padding: 5px 9px;
+}
+
+/* 复选框 */
+QCheckBox {
+    spacing: 8px;
+}
+
+/* 状态标签特化 */
+QLabel#statusLabel {
+    color: #6B7280;
+    font-size: 13px;
+}

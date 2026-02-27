@@ -1,0 +1,30 @@
+2026-02-27 15:57:06,069 [ERROR] ftp_manager: Upload failed for 47.97.219.106 (file: E:/Temp/TestFtp.txt): [WinError 10060] 由于连接方在一段时间后没有正确答复或连接的主机没有反应，连接尝试失败。
+Traceback (most recent call last):
+  File "E:\Project\FtpStore\src\core\ftp_manager.py", line 104, in upload_file_to_server
+    ftp.storbinary(f'STOR {filename}', f, 8192, handle_block)
+  File "C:\Program Files\python\lib\ftplib.py", line 487, in storbinary
+    with self.transfercmd(cmd, rest) as conn:
+  File "C:\Program Files\python\lib\ftplib.py", line 382, in transfercmd
+    return self.ntransfercmd(cmd, rest)[0]
+  File "C:\Program Files\python\lib\ftplib.py", line 343, in ntransfercmd
+    conn = socket.create_connection((host, port), self.timeout,
+  File "C:\Program Files\python\lib\socket.py", line 808, in create_connection
+    raise err
+  File "C:\Program Files\python\lib\socket.py", line 796, in create_connection
+    sock.connect(sa)
+TimeoutError: [WinError 10060] 由于连接方在一段时间后没有正确答复或连接的主机没有反应，连接尝试失败。
+2026-02-27 16:05:25,845 [ERROR] ftp_manager: Upload failed for 47.98.228.51 (file: E:/Temp/TestFtp.txt): [WinError 10060] 由于连接方在一段时间后没有正确答复或连接的主机没有反应，连接尝试失败。
+Traceback (most recent call last):
+  File "E:\Project\FtpStore\src\core\ftp_manager.py", line 107, in upload_file_to_server
+    ftp.storbinary(f'STOR {filename}', f, 8192, handle_block)
+  File "C:\Program Files\python\lib\ftplib.py", line 487, in storbinary
+    with self.transfercmd(cmd, rest) as conn:
+  File "C:\Program Files\python\lib\ftplib.py", line 382, in transfercmd
+    return self.ntransfercmd(cmd, rest)[0]
+  File "C:\Program Files\python\lib\ftplib.py", line 343, in ntransfercmd
+    conn = socket.create_connection((host, port), self.timeout,
+  File "C:\Program Files\python\lib\socket.py", line 808, in create_connection
+    raise err
+  File "C:\Program Files\python\lib\socket.py", line 796, in create_connection
+    sock.connect(sa)
+TimeoutError: [WinError 10060] 由于连接方在一段时间后没有正确答复或连接的主机没有反应，连接尝试失败。

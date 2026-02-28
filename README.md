@@ -88,7 +88,7 @@ python src/main.py
 5. **持续迭代与测试**：编写测试用例并使用 `pytest` 等工具保证代码质量。
 
 ## 许可证 (License)
-本项目基于 [MIT License](LICENSE) 开源。(可根据您的实际情况修改)
+本项目基于 [MIT License](LICENSE) 开源。
 
 ## 主要功能 (Core Features)
 1. **一键多发**：支持将多个文件、压缩包或**整个文件夹**（支持子目录穿透）同时上传到多个目标 FTP 服务器，达成一键分发和部署的目的。

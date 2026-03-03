@@ -43,6 +43,24 @@ class ServerListItem(QWidget):
         if self.toggle_callback:
             self.toggle_callback(self.config, is_checked)
 
+class FileListItem(QWidget):
+    def __init__(self, path: str, delete_callback):
+        super().__init__()
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(5, 5, 5, 5)  # Increased top/bottom margins
+        
+        self.path_label = QLabel(path)
+        self.path_label.setToolTip(path)
+        
+        self.del_btn = QPushButton("删除")
+        self.del_btn.setFixedWidth(50)
+        self.del_btn.setMinimumHeight(24) # Added minimum height
+        self.del_btn.setStyleSheet("color: red; padding: 2px;margin-top: -5px;") # Maintained padding but min-height will ensure text fits
+        self.del_btn.clicked.connect(lambda: delete_callback(path))
+        
+        layout.addWidget(self.path_label, stretch=1)
+        layout.addWidget(self.del_btn)
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -197,19 +215,36 @@ class MainWindow(QMainWindow):
         filenames, _ = QFileDialog.getOpenFileNames(self, "选择要分发的文件", "", "All Files (*)")
         if filenames:
             for f in filenames:
-                if f not in self.selected_paths:
-                    self.selected_paths.append(f)
-                    self.file_list_widget.addItem(f)
+                self.add_file_item(f)
             self._reset_progress()
             
     def select_folder(self):
         foldername = QFileDialog.getExistingDirectory(self, "选择要分发的文件夹")
         if foldername:
-            if foldername not in self.selected_paths:
-                self.selected_paths.append(foldername)
-                self.file_list_widget.addItem(foldername)
+            self.add_file_item(foldername)
             self._reset_progress()
             
+    def add_file_item(self, path):
+        if path not in self.selected_paths:
+            self.selected_paths.append(path)
+            
+            item = QListWidgetItem(self.file_list_widget)
+            widget = FileListItem(path, self.remove_file_item)
+            item.setSizeHint(widget.sizeHint())
+            item.setData(Qt.ItemDataRole.UserRole, path)
+            
+            self.file_list_widget.setItemWidget(item, widget)
+            
+    def remove_file_item(self, path):
+        if path in self.selected_paths:
+            self.selected_paths.remove(path)
+            
+        for i in range(self.file_list_widget.count()):
+            item = self.file_list_widget.item(i)
+            if item.data(Qt.ItemDataRole.UserRole) == path:
+                self.file_list_widget.takeItem(i)
+                break
+                
     def clear_files(self):
         self.selected_paths.clear()
         self.file_list_widget.clear()

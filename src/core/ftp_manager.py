@@ -59,13 +59,31 @@ class FtpManager:
     def get_servers_as_dicts(self) -> List[dict]:
         return [s.to_dict() for s in self.servers]
 
+    def _get_ftp_connection(self, config: FtpServerConfig, timeout: int = 60) -> ftplib.FTP:
+        """建立 FTP 连接并配置编码为 UTF-8"""
+        ftp = ftplib.FTP()
+        # 强制使用 UTF-8 编码，解决中文文件名报错 UnicodeEncodeError
+        ftp.encoding = 'utf-8'
+        
+        logger.debug(f"Connecting to {config.host}:{config.port} (timeout={timeout})...")
+        ftp.connect(config.host, config.port, timeout=timeout)
+        
+        logger.debug(f"Logging in as {config.username}...")
+        ftp.login(config.username, config.password)
+        
+        # 尝试发送 OPTS UTF8 ON，通知服务器客户端将使用 UTF-8
+        try:
+            ftp.sendcmd('OPTS UTF8 ON')
+        except Exception as e:
+            logger.warning(f"Server {config.host} may not support 'OPTS UTF8 ON': {e}")
+            
+        ftp.set_pasv(config.passive_mode)
+        return ftp
+
     def test_connection(self, config: FtpServerConfig) -> Tuple[bool, str]:
         """测试单个 FTP 服务器的连接状态"""
         try:
-            ftp = ftplib.FTP()
-            ftp.connect(config.host, config.port, timeout=5)
-            ftp.login(config.username, config.password)
-            ftp.set_pasv(config.passive_mode)
+            ftp = self._get_ftp_connection(config, timeout=10)
             ftp.quit()
             return True, "Success"
         except Exception as e:
@@ -104,10 +122,7 @@ class FtpManager:
                             
             uploaded_size = 0
             
-            ftp = ftplib.FTP()
-            ftp.connect(config.host, config.port, timeout=30)
-            ftp.login(config.username, config.password)
-            ftp.set_pasv(config.passive_mode)
+            ftp = self._get_ftp_connection(config, timeout=30)
             
             # 切换到指定目录 (如果提供了且不是根目录)
             if remote_dir and remote_dir.strip() and remote_dir != "/":
@@ -124,9 +139,7 @@ class FtpManager:
             def _upload_file(local_file: str, remote_file_name: str):
                 logger.info(f"Uploading {local_file} -> {remote_file_name} on {config.host}")
                 with open(local_file, 'rb') as f:
-                    if ftp.sock:
-                        ftp.sock.settimeout(60)
-                    ftp.storbinary(f'STOR {remote_file_name}', f, 8192, handle_block)
+                    ftp.storbinary(f'STOR {remote_file_name}', f, 32768, handle_block)
 
             def _upload_recursive(current_local_path: str, current_remote_dir: str):
                 ftp.cwd(current_remote_dir)
@@ -164,10 +177,7 @@ class FtpManager:
     def list_directory(self, config: FtpServerConfig, path: str = "") -> Tuple[bool, List[dict], str]:
         """列出远程目录内容"""
         try:
-            ftp = ftplib.FTP()
-            ftp.connect(config.host, config.port, timeout=30)
-            ftp.login(config.username, config.password)
-            ftp.set_pasv(config.passive_mode)
+            ftp = self._get_ftp_connection(config, timeout=30)
             
             if path and path.strip():
                 ftp.cwd(path)
@@ -230,10 +240,7 @@ class FtpManager:
     def download_path(self, config: FtpServerConfig, remote_path: str, local_save_dir: str, is_dir: bool = False, progress_callback: Optional[Callable] = None) -> Tuple[bool, str]:
         """从服务器下载单个文件或整个目录到本地"""
         try:
-            ftp = ftplib.FTP()
-            ftp.connect(config.host, config.port, timeout=30)
-            ftp.login(config.username, config.password)
-            ftp.set_pasv(config.passive_mode)
+            ftp = self._get_ftp_connection(config, timeout=30)
 
             def _download_file(r_file: str, l_file: str):
                 logger.info(f"Downloading {r_file} -> {l_file}")
@@ -254,13 +261,11 @@ class FtpManager:
                         progress_callback(config.host, downloaded_size, file_size)
 
                 with open(l_file, 'wb') as f:
-                    if ftp.sock:
-                        ftp.sock.settimeout(60)
                     try:
                         ftp.voidcmd('TYPE I')
                     except Exception as e:
                         logger.warning(f"Failed to set TYPE I for download: {e}")
-                    ftp.retrbinary(f'RETR {r_file}', handle_block)
+                    ftp.retrbinary(f'RETR {r_file}', handle_block, 32768)
 
             def _download_recursive(r_path: str, l_dir: str):
                 # Try to list the directory to see its contents
@@ -314,10 +319,7 @@ class FtpManager:
     def delete_path(self, config: FtpServerConfig, remote_path: str, is_dir: bool = False) -> Tuple[bool, str]:
         """在服务器上删除文件或递归删除整个目录"""
         try:
-            ftp = ftplib.FTP()
-            ftp.connect(config.host, config.port, timeout=30)
-            ftp.login(config.username, config.password)
-            ftp.set_pasv(config.passive_mode)
+            ftp = self._get_ftp_connection(config, timeout=30)
 
             def _delete_recursive(tgt_dir: str):
                 ftp.cwd(tgt_dir)

@@ -14,3 +14,4 @@ env/
 build/
 dist/
 *.spec
+ftp_config.json

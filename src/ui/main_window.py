@@ -66,6 +66,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("FtpTool - 一键分发工具")
         self.resize(1000, 600)
+        self.setAcceptDrops(True)
         
         self.ftp_manager = FtpManager()
         self.load_servers()
@@ -80,6 +81,28 @@ class MainWindow(QMainWindow):
         self.timer.timeout.connect(self.check_threads)
         self.threads = []
         
+    def dragEnterEvent(self, e):
+        if e.mimeData().hasUrls():
+            e.accept()
+        else:
+            e.ignore()
+
+    def dragMoveEvent(self, e):
+        if e.mimeData().hasUrls():
+            e.accept()
+        else:
+            e.ignore()
+
+    def dropEvent(self, e):
+        if e.mimeData().hasUrls():
+            paths = []
+            for url in e.mimeData().urls():
+                if url.isLocalFile():
+                    paths.append(url.toLocalFile())
+            if paths:
+                self.handle_files_dropped(paths)
+            e.accept()
+        
     def setup_ui(self):
         self.splitter = QSplitter(Qt.Orientation.Horizontal)
         self.setCentralWidget(self.splitter)
@@ -89,7 +112,7 @@ class MainWindow(QMainWindow):
         left_layout = QVBoxLayout(left_widget)
         
         # --- File Selection Area ---
-        file_group = QGroupBox("1. 选择要分发的文件/文件夹")
+        file_group = QGroupBox("1. 选择要分发的文件/文件夹 (支持将文件直接拖入主界面)")
         file_layout = QVBoxLayout(file_group)
         
         self.file_list_widget = QListWidget()
@@ -250,6 +273,11 @@ class MainWindow(QMainWindow):
         self.file_list_widget.clear()
         self._reset_progress()
             
+    def handle_files_dropped(self, paths):
+        for path in paths:
+            self.add_file_item(path)
+        self._reset_progress()
+
     def add_server(self):
         dlg = ServerDialog(self)
         if dlg.exec():
